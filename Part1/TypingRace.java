@@ -233,7 +233,6 @@ public class TypingRace {
             if (spacesAfter > 0) {
                 spacesAfter--; // ~ takes one character space
             }
-            spacesAfter--; // symbol + ~ together take two characters
         }
 
         multiplePrint(' ', spacesAfter);
