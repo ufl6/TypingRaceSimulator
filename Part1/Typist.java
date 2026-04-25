@@ -1,6 +1,13 @@
-
-/**
- * Write a description of class Typist here.
+ /**
+ *
+ * Shows a typist participating in a typing race.
+ *
+ * - Tracks progress through the passage (number of characters typed)
+ * - Tracks and changes accuracy (0.0 – 1.0) affecting typing success
+ * - Handles mistypes by allowing backward movement (slideBack)
+ * - Has burnout state, preventing typing for a number of turns
+ * - Methods to update and reset typist state
+ */
  *
  * Starter code generously abandoned by Ty Posaurus, your predecessor,
  * who typed with two fingers and considered that "good enough".
@@ -8,8 +15,9 @@
  * It is not optional. Good luck.
  *
  * @author Umer Liaquat
- * @version v1.0
- */
+ * @version v1
+
+*/
 public class Typist {
     // Fields of class Typist
 
@@ -19,6 +27,7 @@ public class Typist {
     private boolean burntOut;
     private int burnoutTurnsRemaining;
     private double accuracy;
+    private boolean justMistyped;
 
     // Constructor of class Typist
     /**
@@ -37,7 +46,7 @@ public class Typist {
         this.burntOut = false;
         this.burnoutTurnsRemaining = 0;
         setAccuracy(typistAccuracy);
-
+        this.justMistyped = false;
     }
 
     // Methods of class Typist
@@ -127,6 +136,7 @@ public class Typist {
         this.progress = 0;
         this.burntOut = false;
         this.burnoutTurnsRemaining = 0;
+        this.justMistyped = false;
     }
 
     /**
@@ -159,6 +169,7 @@ public class Typist {
         if (this.progress < 0) {
             this.progress = 0;
         }
+        this.justMistyped = true;
     }
 
     /**
@@ -184,6 +195,14 @@ public class Typist {
      */
     public void setSymbol(char newSymbol) {
         this.symbol = newSymbol;
+    }
+
+    public boolean hasJustMistyped() {
+        return this.justMistyped;
+    }
+
+    public void clearMistypeFlag() {
+        this.justMistyped = false;
     }
 
 }

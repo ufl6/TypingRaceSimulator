@@ -189,7 +189,7 @@ public class TypingRace {
 
         multiplePrint('=', passageLength + 3);
         System.out.println();
-        System.out.println("  [zz] = burnt out    [<] = just mistyped");
+        System.out.println("  [~] = burnt out    [<] = just mistyped");
     }
 
     /**
@@ -228,6 +228,14 @@ public class TypingRace {
         // Always show the typist's symbol so they can be identified on screen.
         // Append ~ when burnt out so the state is visible without hiding identity.
         System.out.print(theTypist.getSymbol());
+        if (theTypist.hasJustMistyped()) {
+            System.out.print('<');
+            if (spacesAfter > 0) {
+                spacesAfter--;
+            }
+        }
+        theTypist.clearMistypeFlag();
+
         if (theTypist.isBurntOut()) {
             System.out.print('~');
             if (spacesAfter > 0) {
