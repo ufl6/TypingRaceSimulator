@@ -272,6 +272,74 @@ public class TypingRace {
         }
     }
 
+    public void startRaceGUI(JTextArea outputArea) {
+        Typist winner = null;
+        boolean finished = false;
+
+        if (seat1Typist != null) {
+            seat1Typist.resetToStart();
+        }
+        if (seat2Typist != null) {
+            seat2Typist.resetToStart();
+        }
+        if (seat3Typist != null) {
+            seat3Typist.resetToStart();
+        }
+
+        while (!finished) {
+
+            advanceTypist(seat1Typist);
+            advanceTypist(seat2Typist);
+            advanceTypist(seat3Typist);
+
+            // Print to GUI instead of console
+            outputArea.append(getRaceState() + "\n");
+
+            if (raceFinishedBy(seat1Typist)) {
+                winner = seat1Typist;
+                finished = true;
+            } else if (raceFinishedBy(seat2Typist)) {
+                winner = seat2Typist;
+                finished = true;
+            } else if (raceFinishedBy(seat3Typist)) {
+                winner = seat3Typist;
+                finished = true;
+            }
+
+            try {
+                Thread.sleep(200);
+            } catch (Exception e) {
+            }
+        }
+
+        if (winner != null) {
+            outputArea.append("🏁 " + winner.getName() + " wins!\n");
+        }
+
+    }
+
+    private String getRaceState() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(printLane(seat1Typist)).append("\n");
+        sb.append(printLane(seat2Typist)).append("\n");
+        sb.append(printLane(seat3Typist)).append("\n");
+        return sb.toString();
+    }
+
+    private String printLane(Typist t) {
+        if (t == null) {
+            return "Empty";
+        }
+
+        int progress = Math.min(t.getProgress(), passageLength);
+        StringBuilder lane = new StringBuilder();
+        for (int i = 0; i < progress; i++) {
+            lane.append(" ");
+        }
+        lane.append(t.getSymbol());
+        return lane.toString() + " " + t.getName();
+    }
+
     public static void main(String[] args) {
         TypingRace race = new TypingRace(40);
         race.addTypist(new Typist('%', "Mohammed", 0.85), 1);

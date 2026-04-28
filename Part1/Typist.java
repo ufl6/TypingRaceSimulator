@@ -1,4 +1,5 @@
- /**
+
+/**
  *
  * Shows a typist participating in a typing race.
  *
@@ -7,7 +8,6 @@
  * - Handles mistypes by allowing backward movement (slideBack)
  * - Has burnout state, preventing typing for a number of turns
  * - Methods to update and reset typist state
- */
  *
  * Starter code generously abandoned by Ty Posaurus, your predecessor,
  * who typed with two fingers and considered that "good enough".
@@ -17,7 +17,7 @@
  * @author Umer Liaquat
  * @version v1
 
-*/
+  **/
 public class Typist {
     // Fields of class Typist
 
