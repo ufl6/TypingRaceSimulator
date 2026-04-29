@@ -1,4 +1,11 @@
 
+/**
+ * A typing race simulation. The typists race to complete a passage of text,
+ * advancing character by character — or sliding backwards when they mistype.
+ *
+ * @author Umer Liaquat
+ * @version 1
+ */
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -42,7 +49,7 @@ public class TypingRaceGUI extends JFrame {
 
     private String passage;
     private int passageLength;
-    private int globalTurn;
+    private int turnNumber;
     private long raceStartTime;
     private boolean raceRunning;
 
@@ -156,9 +163,6 @@ public class TypingRaceGUI extends JFrame {
                 "None", "Wrist Support", "Energy Drink", "Noise-Cancelling Headphones"
             });
 
-            // styleBoxes[i].setPreferredSize(new Dimension(170, 30));
-            // keyboardBoxes[i].setPreferredSize(new Dimension(170, 30));
-            // accessoryBoxes[i].setPreferredSize(new Dimension(170, 30));
             final int index = i;
             colorButtons[i] = new JButton("Choose Colour");
             colorButtons[i].setBackground(selectedColors[i]);
@@ -212,10 +216,10 @@ public class TypingRaceGUI extends JFrame {
             return;
         }
 
-        int seats = (Integer) seatCountBox.getSelectedItem();
+        int numberOfTypists = (Integer) seatCountBox.getSelectedItem();
 
         for (int i = 0; i < MAX_TYPISTS; i++) {
-            typistRows[i].setVisible(i < seats);
+            typistRows[i].setVisible(i < numberOfTypists);
         }
 
         typistPanel.revalidate();
@@ -269,11 +273,11 @@ public class TypingRaceGUI extends JFrame {
     }
 
     private void chooseColour(int index) {
-        Color chosen = JColorChooser.showDialog(this, "Choose Typist Colour", selectedColors[index]);
+        Color chosenColour = JColorChooser.showDialog(this, "Choose Typist Colour", selectedColors[index]);
 
-        if (chosen != null) {
-            selectedColors[index] = chosen;
-            colorButtons[index].setBackground(chosen);
+        if (chosenColour != null) {
+            selectedColors[index] = chosenColour;
+            colorButtons[index].setBackground(chosenColour);
         }
     }
 
@@ -289,13 +293,13 @@ public class TypingRaceGUI extends JFrame {
         passage = getSelectedPassage();
         passageLength = passage.length();
 
-        int seats = (Integer) seatCountBox.getSelectedItem();
+        int numberOfTypists = (Integer) seatCountBox.getSelectedItem();
 
         JLabel mainPassageLabel = new JLabel("<html><b>Passage:</b> " + escapeHtml(passage) + "</html>");
         racePanel.add(mainPassageLabel);
         racePanel.add(Box.createVerticalStrut(10));
 
-        for (int i = 0; i < seats; i++) {
+        for (int i = 0; i < numberOfTypists; i++) {
             String name = nameFields[i].getText();
             String symbol = symbolFields[i].getText();
 
@@ -327,25 +331,25 @@ public class TypingRaceGUI extends JFrame {
                     + " | Accessory: " + accessory
                     + " | Starting Accuracy: " + String.format("%.2f", accuracy));
 
-            JProgressBar bar = new JProgressBar(0, passageLength);
-            bar.setStringPainted(true);
-            bar.setForeground(selectedColors[i]);
+            JProgressBar progressBar = new JProgressBar(0, passageLength);
+            progressBar.setStringPainted(true);
+            progressBar.setForeground(selectedColors[i]);
 
             JLabel typedPassageLabel = new JLabel(buildPassageHTML(typist));
 
             racePanel.add(infoLabel);
-            racePanel.add(bar);
+            racePanel.add(progressBar);
             racePanel.add(typedPassageLabel);
             racePanel.add(Box.createVerticalStrut(10));
 
-            progressBars.add(bar);
+            progressBars.add(progressBar);
             passageLabels.add(typedPassageLabel);
         }
 
         racePanel.revalidate();
         racePanel.repaint();
 
-        globalTurn = 0;
+        turnNumber = 0;
         raceRunning = true;
         raceStartTime = System.currentTimeMillis();
 
@@ -404,7 +408,7 @@ public class TypingRaceGUI extends JFrame {
             return;
         }
 
-        globalTurn++;
+        turnNumber++;
 
         GUITypist winner = null;
 
@@ -431,7 +435,7 @@ public class TypingRaceGUI extends JFrame {
 
         double effectiveAccuracy = typist.getCurrentAccuracy();
 
-        if (caffeineBox.isSelected() && globalTurn <= 10) {
+        if (caffeineBox.isSelected() && turnNumber <= 10) {
             effectiveAccuracy += 0.10;
         }
 
@@ -448,7 +452,7 @@ public class TypingRaceGUI extends JFrame {
         if (Math.random() < effectiveAccuracy) {
             typist.typeCharacter();
 
-            if (caffeineBox.isSelected() && globalTurn <= 10 && Math.random() < 0.25) {
+            if (caffeineBox.isSelected() && turnNumber <= 10 && Math.random() < 0.25) {
                 typist.typeCharacter();
             }
         }
@@ -475,7 +479,7 @@ public class TypingRaceGUI extends JFrame {
 
         double burnoutChance = 0.03 * effectiveAccuracy * effectiveAccuracy;
 
-        if (caffeineBox.isSelected() && globalTurn > 10) {
+        if (caffeineBox.isSelected() && turnNumber > 10) {
             burnoutChance += 0.03;
         }
 
@@ -505,7 +509,7 @@ public class TypingRaceGUI extends JFrame {
     private void updateRaceDisplay() {
         for (int i = 0; i < typists.size(); i++) {
             GUITypist typist = typists.get(i);
-            JProgressBar bar = progressBars.get(i);
+            JProgressBar progressBar = progressBars.get(i);
 
             int progress = typist.getProgress();
 
@@ -513,7 +517,7 @@ public class TypingRaceGUI extends JFrame {
                 progress = passageLength;
             }
 
-            bar.setValue(progress);
+            progressBar.setValue(progress);
 
             String text = typist.getSymbol() + " " + progress + "/" + passageLength;
 
@@ -521,7 +525,7 @@ public class TypingRaceGUI extends JFrame {
                 text += " | BURNT OUT (" + typist.getBurnoutTurnsRemaining() + ")";
             }
 
-            bar.setString(text);
+            progressBar.setString(text);
             passageLabels.get(i).setText(buildPassageHTML(typist));
         }
     }

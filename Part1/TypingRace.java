@@ -2,11 +2,11 @@
 import java.util.concurrent.TimeUnit;
 
 /**
- * A typing race simulation. Three typists race to complete a passage of text,
+ * A typing race simulation. The typists race to complete a passage of text,
  * advancing character by character — or sliding backwards when they mistype.
  *
  * @author Umer Liaquat
- * @version 1.0
+ * @version 1
  */
 public class TypingRace {
 
@@ -99,7 +99,7 @@ public class TypingRace {
         }
 
         if (winner != null) {
-            System.out.println("🏁 " + winner.getName() + " wins the race!");
+            System.out.println(winner.getName() + " wins the race!");
             System.out.println("Final accuracy: " + winner.getAccuracy());
         } else {
             System.out.println("The winner couldn't be determined.");
@@ -174,7 +174,7 @@ public class TypingRace {
     private void printRace() {
         System.out.print('\u000C'); // Clear terminal
 
-        System.out.println("  TYPING RACE — passage length: " + passageLength + " chars");
+        System.out.println("  TYPING RACE - passage length: " + passageLength + " chars");
         multiplePrint('=', passageLength + 3);
         System.out.println();
 
@@ -270,74 +270,6 @@ public class TypingRace {
             System.out.print(aChar);
             i = i + 1;
         }
-    }
-
-    public void startRaceGUI(JTextArea outputArea) {
-        Typist winner = null;
-        boolean finished = false;
-
-        if (seat1Typist != null) {
-            seat1Typist.resetToStart();
-        }
-        if (seat2Typist != null) {
-            seat2Typist.resetToStart();
-        }
-        if (seat3Typist != null) {
-            seat3Typist.resetToStart();
-        }
-
-        while (!finished) {
-
-            advanceTypist(seat1Typist);
-            advanceTypist(seat2Typist);
-            advanceTypist(seat3Typist);
-
-            // Print to GUI instead of console
-            outputArea.append(getRaceState() + "\n");
-
-            if (raceFinishedBy(seat1Typist)) {
-                winner = seat1Typist;
-                finished = true;
-            } else if (raceFinishedBy(seat2Typist)) {
-                winner = seat2Typist;
-                finished = true;
-            } else if (raceFinishedBy(seat3Typist)) {
-                winner = seat3Typist;
-                finished = true;
-            }
-
-            try {
-                Thread.sleep(200);
-            } catch (Exception e) {
-            }
-        }
-
-        if (winner != null) {
-            outputArea.append("🏁 " + winner.getName() + " wins!\n");
-        }
-
-    }
-
-    private String getRaceState() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(printLane(seat1Typist)).append("\n");
-        sb.append(printLane(seat2Typist)).append("\n");
-        sb.append(printLane(seat3Typist)).append("\n");
-        return sb.toString();
-    }
-
-    private String printLane(Typist t) {
-        if (t == null) {
-            return "Empty";
-        }
-
-        int progress = Math.min(t.getProgress(), passageLength);
-        StringBuilder lane = new StringBuilder();
-        for (int i = 0; i < progress; i++) {
-            lane.append(" ");
-        }
-        lane.append(t.getSymbol());
-        return lane.toString() + " " + t.getName();
     }
 
     public static void main(String[] args) {

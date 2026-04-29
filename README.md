@@ -1,56 +1,87 @@
-# TypingRaceSimulator
+# Typing Race Simulator
 
 Object Oriented Programming Project — ECS414U
+
+---
 
 ## Project Structure
 
 ```
 TypingRaceSimulator/
-├── Part1/    # Textual simulation (Java, command-line)
-└── Part2/    # GUI simulation (to be completed)
+├── Part1/    # Text-based simulation
+├── Part2/    # GUI-based simulation
+├── Report.pdf
+├── README.md
+└── .gitignore
 ```
 
-## Part 1 — Textual Simulation
+---
 
-### How to compile
+## Part 1 — Text Simulation
+
+Part 1 implements the core typing race logic using Java classes.
+
+### Compile
 
 ```bash
 cd Part1
-javac Typist.java TypingRace.java
+javac *.java
 ```
 
-### How to run
-
-The race is started by calling `startRace()` on a `TypingRace` object.
-A simple way to test this is to add a `main` method to `TypingRace`, for example:
-
-```java
-public static void main(String[] args) {
-    TypingRace race = new TypingRace(40);
-    race.addTypist(new Typist('①', "TURBOFINGERS", 0.85), 1);
-    race.addTypist(new Typist('②', "QWERTY_QUEEN",  0.60), 2);
-    race.addTypist(new Typist('③', "HUNT_N_PECK",   0.30), 3);
-    race.startRace();
-}
-```
-
-Then run:
+### Run
 
 ```bash
 java TypingRace
 ```
 
+This runs a console-based typing race between multiple typists.
+
+---
+
 ## Part 2 — GUI Simulation
 
-To be implemented as part of the coursework. Place all GUI-related source files in this folder. The graphical version is started by calling `startRaceGUI()`.
+Part 2 extends the project with a graphical user interface using Java Swing.
+
+### Features
+
+* Typist customisation (name, symbol, colour)
+* Typing styles, keyboard types, and accessories
+* Race modifiers (autocorrect, caffeine mode, night shift)
+* Real-time race display with progress bars
+* Statistics (WPM, accuracy, burnouts)
+* Leaderboard and race history
+* Comparison view between typists
+
+### Compile
+
+```bash
+cd Part2
+javac *.java
+```
+
+### Run
+
+```bash
+java TypingRaceGUI
+```
+
+---
 
 ## Dependencies
 
-- Java Development Kit (JDK) 11 or higher
-- No external libraries required for Part 1
-- Part 2 may use Java Swing (included in standard JDK) or JavaFX
+* Java Development Kit (JDK 11 or higher)
+* Uses standard Java libraries (Swing for GUI)
+* No external libraries required
+
+---
 
 ## Notes
 
-- All code should compile and run using standard command-line tools without any IDE-specific configuration.
-- The starter code in Part1 was originally written by Ty Posaurus. It contains known issues — finding and fixing them is part of the coursework.
+* `.class` files are excluded using `.gitignore`.
+* The GUI version builds on the logic developed in Part 1.
+
+---
+
+## Author
+
+Umer Liaquat

@@ -1,4 +1,11 @@
 
+/**
+ * Tests all features of the Typist class, including typing characters, sliding back, burnout mechanics, accuracy adjustments, and resetting to start.
+ * Each test case checks the expected behavior against the actual state of the Typist instance after performing specific actions.
+ *
+ * @author Umer Liaquat
+ * @version 1
+ */
 public class TypistTest {
 
     public static void main(String[] args) {

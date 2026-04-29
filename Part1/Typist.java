@@ -9,15 +9,11 @@
  * - Has burnout state, preventing typing for a number of turns
  * - Methods to update and reset typist state
  *
- * Starter code generously abandoned by Ty Posaurus, your predecessor,
- * who typed with two fingers and considered that "good enough".
- * He left a sticky note: "the slide-back thing is optional probably".
- * It is not optional. Good luck.
- *
  * @author Umer Liaquat
  * @version v1
 
-  **/
+  *****
+ */
 public class Typist {
     // Fields of class Typist
 
