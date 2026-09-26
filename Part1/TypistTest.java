@@ -1,56 +1,209 @@
-
 /**
- * Tests all features of the Typist class, including typing characters, sliding back, burnout mechanics, accuracy adjustments, and resetting to start.
- * Each test case checks the expected behavior against the actual state of the Typist instance after performing specific actions.
+ * Tests the behaviour of the Typist class.
+ *
+ * Each test checks an expected condition and reports whether
+ * the behaviour passed or failed.
  *
  * @author Umer Liaquat
- * @version 1
+ * @version 2
  */
 public class TypistTest {
 
+    private static int passed = 0;
+    private static int failed = 0;
+
     public static void main(String[] args) {
-        Typist test = new Typist('£', "Test Typist", 0.75);
 
-        // Test 1: typeCharacter
-        test.typeCharacter();
-        test.typeCharacter();
-        test.typeCharacter();
-        System.out.println("Progress after 3 characters should be 3. Current Progress: " + test.getProgress());
+        testTyping();
+        testSlideBack();
+        testBurnout();
+        testAccuracyLimits();
+        testReset();
 
-        // Test 2: slideback shouldn't be less than zero
-        test.slideBack(5);
-        System.out.println("Progress after sliding back 5 should be 0. Current Progress: " + test.getProgress());
+        System.out.println();
+        System.out.println("Test Summary");
+        System.out.println("------------");
+        System.out.println("Passed: " + passed);
+        System.out.println("Failed: " + failed);
+    }
 
-        // Test 3: countdown for burnout
-        test.burnOut(3);
-        System.out.println("Is typist burnt out? Should be true. Burnt out: " + test.isBurntOut());
-        System.out.println("Burnout turns remaining should be 3. Current burnout turns remaining: " + test.getBurnoutTurnsRemaining());
+    /**
+     * Checks whether a condition is true and prints the result.
+     */
+    private static void check(
+            String testName,
+            boolean condition) {
 
-        test.recoverFromBurnout();
-        System.out.println("After 1 recovery, burnout turns remaining should be 2. Current burnout turns remaining: " + test.getBurnoutTurnsRemaining());
-        test.recoverFromBurnout();
-        System.out.println("After 2 recoveries, burnout turns remaining should be 1. Current burnout turns remaining: " + test.getBurnoutTurnsRemaining());
-        test.recoverFromBurnout();
-        System.out.println("After 3 recoveries, typist should no longer be burnt out. Burnt out: " + test.isBurntOut());
-        System.out.println("Burnout turns remaining should be 0. Current burnout turns remaining: " + test.getBurnoutTurnsRemaining());
+        if (condition) {
+            System.out.println("[PASS] " + testName);
+            passed++;
+        } else {
+            System.out.println("[FAIL] " + testName);
+            failed++;
+        }
+    }
 
-        // Test 4: testing accuracy in range
-        test.setAccuracy(1.2);
-        System.out.println("Accuracy should be capped at 1.0. Current accuracy: " + test.getAccuracy());
-        test.setAccuracy(-0.7);
-        System.out.println("Accuracy should be floored at 0.0. Current accuracy: " + test.getAccuracy());
-        test.setAccuracy(0.5);
-        System.out.println("Accuracy should be set to 0.5. Current accuracy: " + test.getAccuracy());
+    /**
+     * Tests normal typing progress.
+     */
+    private static void testTyping() {
 
-        // Test 5: resetToStart()
-        test.typeCharacter();
-        test.typeCharacter();
-        test.burnOut(2);
-        test.resetToStart();
+        Typist typist =
+                new Typist('£', "Test Typist", 0.75);
 
-        System.out.println("After reset, progress should be 0. Current Progress: " + test.getProgress());
-        System.out.println("After reset, typist should not be burnt out. Burnt out: " + test.isBurntOut());
-        System.out.println("After reset, burnout turns remaining should be 0. Current burnout turns remaining: " + test.getBurnoutTurnsRemaining());
+        typist.typeCharacter();
+        typist.typeCharacter();
+        typist.typeCharacter();
 
+        check(
+                "Typing three characters increases progress to 3",
+                typist.getProgress() == 3
+        );
+    }
+
+    /**
+     * Tests that sliding backwards cannot produce
+     * negative progress.
+     */
+    private static void testSlideBack() {
+
+        Typist typist =
+                new Typist('£', "Test Typist", 0.75);
+
+        typist.typeCharacter();
+        typist.typeCharacter();
+        typist.typeCharacter();
+
+        typist.slideBack(5);
+
+        check(
+                "Progress cannot fall below zero",
+                typist.getProgress() == 0
+        );
+
+        check(
+                "Mistype flag is recorded after slideBack",
+                typist.hasJustMistyped()
+        );
+
+        typist.clearMistypeFlag();
+
+        check(
+                "Mistype flag can be cleared",
+                !typist.hasJustMistyped()
+        );
+    }
+
+    /**
+     * Tests burnout and recovery behaviour.
+     */
+    private static void testBurnout() {
+
+        Typist typist =
+                new Typist('£', "Test Typist", 0.75);
+
+        typist.burnOut(3);
+
+        check(
+                "Typist enters burnout state",
+                typist.isBurntOut()
+        );
+
+        check(
+                "Burnout begins with three turns remaining",
+                typist.getBurnoutTurnsRemaining() == 3
+        );
+
+        typist.recoverFromBurnout();
+
+        check(
+                "One recovery reduces burnout to two turns",
+                typist.getBurnoutTurnsRemaining() == 2
+        );
+
+        typist.recoverFromBurnout();
+
+        check(
+                "Two recoveries leave one burnout turn",
+                typist.getBurnoutTurnsRemaining() == 1
+        );
+
+        typist.recoverFromBurnout();
+
+        check(
+                "Typist recovers after final burnout turn",
+                !typist.isBurntOut()
+        );
+
+        check(
+                "Recovered typist has zero burnout turns",
+                typist.getBurnoutTurnsRemaining() == 0
+        );
+    }
+
+    /**
+     * Tests that accuracy remains in the valid
+     * range from 0.0 to 1.0.
+     */
+    private static void testAccuracyLimits() {
+
+        Typist typist =
+                new Typist('£', "Test Typist", 0.75);
+
+        typist.setAccuracy(1.2);
+
+        check(
+                "Accuracy is capped at 1.0",
+                typist.getAccuracy() == 1.0
+        );
+
+        typist.setAccuracy(-0.7);
+
+        check(
+                "Accuracy is floored at 0.0",
+                typist.getAccuracy() == 0.0
+        );
+
+        typist.setAccuracy(0.5);
+
+        check(
+                "Valid accuracy is stored unchanged",
+                typist.getAccuracy() == 0.5
+        );
+    }
+
+    /**
+     * Tests resetting a typist before a new race.
+     */
+    private static void testReset() {
+
+        Typist typist =
+                new Typist('£', "Test Typist", 0.75);
+
+        typist.typeCharacter();
+        typist.typeCharacter();
+        typist.burnOut(2);
+
+        typist.resetToStart();
+
+        check(
+                "Reset returns progress to zero",
+                typist.getProgress() == 0
+        );
+
+        check(
+                "Reset clears burnout state",
+                !typist.isBurntOut()
+        );
+
+        check(
+                "Reset clears burnout countdown",
+                typist.getBurnoutTurnsRemaining() == 0
+        );
+
+        check(
+                "Reset clears mistype state",
+                !typist.hasJustMistyped()
+        );
     }
 }

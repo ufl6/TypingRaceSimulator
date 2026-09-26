@@ -46,16 +46,14 @@ public class TypingRaceGUI extends JFrame {
 
     private Timer timer;
     private Leaderboard leaderboard;
-
+    private RaceEngine raceEngine;
+    
     private String passage;
     private int passageLength;
-    private int turnNumber;
     private long raceStartTime;
     private boolean raceRunning;
-
+    
     private static final int MAX_TYPISTS = 6;
-    private static final int SLIDE_BACK_AMOUNT = 2;
-    private static final int BURNOUT_DURATION = 3;
 
     public TypingRaceGUI() {
         leaderboard = new Leaderboard();
@@ -292,7 +290,9 @@ public class TypingRaceGUI extends JFrame {
 
         passage = getSelectedPassage();
         passageLength = passage.length();
-
+        
+        raceEngine = new RaceEngine(passageLength);
+        
         int numberOfTypists = (Integer) seatCountBox.getSelectedItem();
 
         JLabel mainPassageLabel = new JLabel("<html><b>Passage:</b> " + escapeHtml(passage) + "</html>");
@@ -349,10 +349,9 @@ public class TypingRaceGUI extends JFrame {
         racePanel.revalidate();
         racePanel.repaint();
 
-        turnNumber = 0;
         raceRunning = true;
         raceStartTime = System.currentTimeMillis();
-
+        
         timer = new Timer(200, e -> raceTurn());
         timer.start();
     }
@@ -404,108 +403,37 @@ public class TypingRaceGUI extends JFrame {
     }
 
     private void raceTurn() {
+
         if (!raceRunning) {
             return;
         }
-
-        turnNumber++;
-
+    
+        raceEngine.nextTurn();
+    
         GUITypist winner = null;
-
+    
         for (GUITypist typist : typists) {
-            advanceTypist(typist);
-
-            if (typist.getProgress() >= passageLength && winner == null) {
+    
+            raceEngine.advanceTypist(
+                    typist,
+                    autocorrectBox.isSelected(),
+                    caffeineBox.isSelected()
+            );
+    
+            if (typist.getProgress() >= passageLength
+                    && winner == null) {
+    
                 winner = typist;
             }
         }
-
+    
         updateRaceDisplay();
-
+    
         if (winner != null) {
             finishRace(winner);
         }
     }
-
-    private void advanceTypist(GUITypist typist) {
-        if (typist.isBurntOut()) {
-            typist.recoverFromBurnout();
-            return;
-        }
-
-        double effectiveAccuracy = typist.getCurrentAccuracy();
-
-        if (caffeineBox.isSelected() && turnNumber <= 10) {
-            effectiveAccuracy += 0.10;
-        }
-
-        if (typist.getAccessory().equals("Energy Drink")) {
-            if (typist.getProgress() < passageLength / 2) {
-                effectiveAccuracy += 0.08;
-            } else {
-                effectiveAccuracy -= 0.08;
-            }
-        }
-
-        effectiveAccuracy = clampAccuracy(effectiveAccuracy);
-
-        if (Math.random() < effectiveAccuracy) {
-            typist.typeCharacter();
-
-            if (caffeineBox.isSelected() && turnNumber <= 10 && Math.random() < 0.25) {
-                typist.typeCharacter();
-            }
-        }
-
-        int slideAmount = SLIDE_BACK_AMOUNT;
-
-        if (autocorrectBox.isSelected()) {
-            slideAmount = 1;
-        }
-
-        double mistypeChance = (1 - effectiveAccuracy) * 0.25;
-
-        if (typist.getAccessory().equals("Noise-Cancelling Headphones")) {
-            mistypeChance -= 0.05;
-        }
-
-        if (mistypeChance < 0.0) {
-            mistypeChance = 0.0;
-        }
-
-        if (Math.random() < mistypeChance) {
-            typist.slideBack(slideAmount);
-        }
-
-        double burnoutChance = 0.03 * effectiveAccuracy * effectiveAccuracy;
-
-        if (caffeineBox.isSelected() && turnNumber > 10) {
-            burnoutChance += 0.03;
-        }
-
-        if (typist.getStyle().equals("Touch Typist")) {
-            burnoutChance += 0.01;
-        }
-
-        if (typist.getAccessory().equals("Wrist Support")) {
-            burnoutChance -= 0.01;
-        }
-
-        if (burnoutChance < 0.0) {
-            burnoutChance = 0.0;
-        }
-
-        if (Math.random() < burnoutChance) {
-            int duration = BURNOUT_DURATION;
-
-            if (typist.getAccessory().equals("Wrist Support")) {
-                duration = 2;
-            }
-
-            typist.burnOut(duration);
-        }
-    }
-
+    
     private void updateRaceDisplay() {
         for (int i = 0; i < typists.size(); i++) {
             GUITypist typist = typists.get(i);
